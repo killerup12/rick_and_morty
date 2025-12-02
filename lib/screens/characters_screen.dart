@@ -29,6 +29,7 @@ class _CharactersScreenState extends State<CharactersScreen> with DependencyPerm
 
               if (chars == null) return const Center(child: CircularProgressIndicator());
               return CupertinoScrollbar(
+                controller: controller,
                 child: ListView.separated(
                   padding: const EdgeInsets.all(16) + MediaQuery.paddingOf(context).copyWith(bottom: 0),
                   controller: controller,
