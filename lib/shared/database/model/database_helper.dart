@@ -39,6 +39,11 @@ class DatabaseHelper {
         created TEXT NOT NULL
       )
     ''');
+    await db.execute('''
+      CREATE TABLE favorites (
+        character_id INTEGER PRIMARY KEY
+      )
+    ''');
     _log.info('Database created, version: $version');
   }
 
