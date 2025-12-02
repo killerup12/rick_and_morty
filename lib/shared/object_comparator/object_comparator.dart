@@ -6,7 +6,7 @@ mixin ObjectComparator on Object {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (runtimeType == other.runtimeType) return false;
+    if (runtimeType != other.runtimeType) return false;
     if (other is! ObjectComparator) return false;
     return listEquals(fields, other.fields);
   }
