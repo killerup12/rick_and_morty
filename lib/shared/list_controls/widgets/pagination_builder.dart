@@ -23,7 +23,7 @@ class PaginationBuilder extends StatefulWidget {
 }
 
 class _PaginationBuilderState extends State<PaginationBuilder> {
-  final _isLoadingMore = ValueNotifier(false);
+  var _isLoadingMore = false;
   ScrollController? _scrollController;
   ScrollController get _effectiveScrollController => widget.controller ?? (_scrollController ??= ScrollController());
 
@@ -35,7 +35,7 @@ class _PaginationBuilderState extends State<PaginationBuilder> {
   @override
   void initState() {
     _effectiveScrollController.addListener(() async {
-      if (_isRefreshing || _isLoadingMore.value) return;
+      if (_isRefreshing || _isLoadingMore) return;
 
       _loadMoreTimer?.cancel();
 
@@ -47,12 +47,12 @@ class _PaginationBuilderState extends State<PaginationBuilder> {
             _effectiveScrollController.position.maxScrollExtent)
           return;
 
-        _isLoadingMore.value = true;
+        _isLoadingMore = true;
         try {
           await widget.onPaginate?.call();
         } finally {
           if (!mounted) return;
-          WidgetsBinding.instance.addPostFrameCallback((_) => _isLoadingMore.value = false);
+          WidgetsBinding.instance.addPostFrameCallback((_) => _isLoadingMore = false);
         }
       });
     });
@@ -63,7 +63,6 @@ class _PaginationBuilderState extends State<PaginationBuilder> {
   @override
   void dispose() {
     _scrollController?.dispose();
-    _isLoadingMore.dispose();
 
     _loadMoreTimer?.cancel();
     super.dispose();
@@ -74,27 +73,18 @@ class _PaginationBuilderState extends State<PaginationBuilder> {
     final size = MediaQuery.of(context).size;
     axisLength = size.height * widget.scrollThreshold;
 
-    return Stack(
-      alignment: .bottomCenter,
-      children: [
-        RefreshIndicator(
-          onRefresh: () async {
-            if (widget.onRefresh == null) return;
+    return RefreshIndicator(
+      onRefresh: () async {
+        if (widget.onRefresh == null) return;
 
-            try {
-              _isRefreshing = true;
-              await widget.onRefresh!();
-            } finally {
-              _isRefreshing = false;
-            }
-          },
-          child: Builder(builder: (context) => widget.builder(context, _effectiveScrollController)),
-        ),
-        ValueListenableBuilder(
-          valueListenable: _isLoadingMore,
-          builder: (context, isLoading, _) => Visibility(visible: isLoading, child: CircularProgressIndicator()),
-        ),
-      ],
+        try {
+          _isRefreshing = true;
+          await widget.onRefresh!();
+        } finally {
+          _isRefreshing = false;
+        }
+      },
+      child: Builder(builder: (context) => widget.builder(context, _effectiveScrollController)),
     );
   }
 }

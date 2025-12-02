@@ -35,12 +35,12 @@ class _CharactersScreenState extends State<CharactersScreen> with DependencyPerm
                   itemCount: chars.length + (charactersStore.canUploadMore ? 0 : 1),
                   separatorBuilder: (context, index) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
-                    if (index >= chars.length) {
+                    if (index >= chars.length && charactersStore.canUploadMore) {
                       return const Center(
-                        child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()),
+                        child: Padding(padding: .all(16), child: CircularProgressIndicator()),
                       );
                     }
-                    return CharacterCard(chars[index]);
+                    return CharacterCard(chars[index], onFavorite: () {});
                   },
                 ),
               );
