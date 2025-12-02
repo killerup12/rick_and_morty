@@ -2,7 +2,7 @@ part of '../characters.dart';
 
 class CharactersServicesNetwork implements CharactersServices {
   @override
-  Future<ListResponse<Character>> getCharacters(FilterQuery filters) async {
+  Future<ListResponse<Character>> getCharacters(CharactersFilters filters) async {
     final json = await ApiManager.instance.get(
       uri: Uri(
         scheme: 'https',

@@ -2,13 +2,13 @@ part of '../characters.dart';
 
 class CharactersStore = _CharactersStoreBase with _$CharactersStore;
 
-abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMixin {
-  _CharactersStoreBase({required CharactersServices onlineServices, required CharactersServices localServices})
+abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMixin<CharactersFilters> {
+  _CharactersStoreBase({required CharactersServices onlineServices, required CharactersServicesWritable localServices})
     : _onlineServices = onlineServices,
       _localServices = localServices;
 
   final CharactersServices _onlineServices;
-  final CharactersServices _localServices;
+  final CharactersServicesWritable _localServices;
 
   @override
   final filters = CharactersFilters();
@@ -20,6 +20,10 @@ abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMix
   void init() {
     super.init();
     uploadRequest((filters) => _onlineServices.getCharacters(filters))
+        .then((result) {
+          _localServices.save(result);
+          return result;
+        })
         .onError((_, __) {
           return _localServices.getCharacters(filters).then((result) => result.response);
         })
@@ -38,6 +42,7 @@ abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMix
   @override
   Future<void> upload() async {
     final chars = await uploadRequest((filters) => _onlineServices.getCharacters(filters));
+    await _localServices.save(chars);
     if (_characters == null) {
       _characters = chars.asObservable();
     } else {

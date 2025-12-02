@@ -57,6 +57,36 @@ class Character extends Entity with ObjectComparator {
   factory Character.fromJson(Map<String, dynamic> json) => _$CharacterFromJson(json);
   Map<String, dynamic> toJson() => _$CharacterToJson(this);
 
+  factory Character.fromDatabase(Map<String, dynamic> map) => Character(
+    id: map['id'] as int,
+    name: map['name'] as String,
+    status: map['status'] as String,
+    species: map['species'] as String,
+    type: map['type'] as String,
+    gender: map['gender'] as String,
+    imageUri: Uri.parse(map['image'] as String),
+    origin: map['origin_id'] != null ? Entity(id: map['origin_id'] as int, name: map['origin_name'] as String) : null,
+    location: map['location_id'] != null ? Entity(id: map['location_id'] as int, name: map['location_name'] as String) : null,
+    episodeUrls: (map['episode'] as String).split(','),
+    created: DateTime.parse(map['created'] as String),
+  );
+
+  Map<String, dynamic> toDatabase() => {
+    'id': id,
+    'name': name,
+    'status': status,
+    'species': species,
+    'type': type,
+    'gender': gender,
+    'image': imageUri.toString(),
+    'origin_id': origin?.id,
+    'origin_name': origin?.name,
+    'location_id': location?.id,
+    'location_name': location?.name,
+    'episode': episodeUrls.join(','),
+    'created': created.toIso8601String(),
+  };
+
   @override
   List<Object> get fields => [imageUri, name, status, species, gender];
 }

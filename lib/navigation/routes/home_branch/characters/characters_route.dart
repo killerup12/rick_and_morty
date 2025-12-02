@@ -6,8 +6,9 @@ class CharactersRoute extends NoTransitionRoute with $CharactersRoute {
   @override
   void injector(BuildContext context, GoRouterState state) {
     super.injector(context, state);
-    final mockService = CharactersServicesNetwork();
-    injectForce(CharactersStore(onlineServices: mockService, localServices: mockService));
+    final onlineServices = CharactersServicesLocal(DatabaseHelper.instance);
+    final localServices = CharactersServicesLocal(DatabaseHelper.instance);
+    injectForce(CharactersStore(onlineServices: onlineServices, localServices: localServices));
   }
 
   @override

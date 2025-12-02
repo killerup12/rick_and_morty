@@ -1,5 +1,9 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:rick_and_morty/navigation/navigation.dart';
+import 'package:rick_and_morty/shared/database/database.dart';
 
 final _goRouter = GoRouter(
   routes: $appRoutes,
@@ -8,8 +12,15 @@ final _goRouter = GoRouter(
   restorationScopeId: 'root',
 );
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    developer.log('${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
+  });
+
+  await DatabaseHelper.instance.database;
 
   runApp(const MyApp());
 }
