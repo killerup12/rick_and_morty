@@ -41,7 +41,12 @@ class _CharactersScreenState extends State<CharactersScreen> with DependencyPerm
                         child: Padding(padding: .all(16), child: CircularProgressIndicator()),
                       );
                     }
-                    return CharacterCard(chars[index], onFavorite: () {});
+                    final character = chars[index];
+                    return CharacterCard(
+                      character,
+                      isFavorite: charactersStore.isFavorite(character),
+                      onFavorite: () => charactersStore.toggleFavorite(character),
+                    );
                   },
                 ),
               );

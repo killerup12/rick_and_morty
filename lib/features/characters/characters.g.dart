@@ -29,6 +29,26 @@ mixin _$CharactersStore on _CharactersStoreBase, Store {
     });
   }
 
+  late final _$_favoritesAtom = Atom(
+    name: '_CharactersStoreBase._favorites',
+    context: context,
+  );
+
+  ObservableList<Character>? get favorites {
+    _$_favoritesAtom.reportRead();
+    return super._favorites;
+  }
+
+  @override
+  ObservableList<Character>? get _favorites => favorites;
+
+  @override
+  set _favorites(ObservableList<Character>? value) {
+    _$_favoritesAtom.reportWrite(value, super._favorites, () {
+      super._favorites = value;
+    });
+  }
+
   late final _$uploadAsyncAction = AsyncAction(
     '_CharactersStoreBase.upload',
     context: context,
@@ -37,6 +57,18 @@ mixin _$CharactersStore on _CharactersStoreBase, Store {
   @override
   Future<void> upload() {
     return _$uploadAsyncAction.run(() => super.upload());
+  }
+
+  late final _$toggleFavoriteAsyncAction = AsyncAction(
+    '_CharactersStoreBase.toggleFavorite',
+    context: context,
+  );
+
+  @override
+  Future<void> toggleFavorite(Character character) {
+    return _$toggleFavoriteAsyncAction.run(
+      () => super.toggleFavorite(character),
+    );
   }
 
   late final _$_CharactersStoreBaseActionController = ActionController(

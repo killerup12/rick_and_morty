@@ -15,10 +15,17 @@ abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMix
 
   @readonly
   ObservableList<Character>? _characters;
+  @readonly
+  ObservableList<Character>? _favorites;
+
+  bool isFavorite(Character character) => _favorites?.contains(character) ?? false;
 
   @override
   void init() {
     super.init();
+    _localServices.getFavorites().then((result) {
+      _favorites = result.response.asObservable();
+    });
     uploadRequest((filters) => _onlineServices.getCharacters(filters))
         .then((result) {
           _localServices.save(result);
@@ -35,6 +42,7 @@ abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMix
   @override
   void dispose() {
     _characters = null;
+    _favorites = null;
     super.dispose();
   }
 
@@ -56,5 +64,17 @@ abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMix
     _characters?.clear();
     toDefault();
     return upload();
+  }
+
+  @action
+  Future<void> toggleFavorite(Character character) async {
+    final isFavorite = _favorites?.contains(character) ?? false;
+    if (isFavorite) {
+      await _localServices.removeFavorite(character);
+      _favorites?.remove(character);
+    } else {
+      await _localServices.addFavorite(character);
+      _favorites?.add(character);
+    }
   }
 }

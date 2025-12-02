@@ -43,6 +43,26 @@ class CharactersServicesLocal implements CharactersServicesWritable {
   }
 
   @override
+  Future<ListResponse<Character>> getFavorites() async {
+    try {
+      final database = await _db.database;
+
+      final maps = await database.rawQuery('''
+        SELECT c.* FROM characters c
+        INNER JOIN favorites f ON c.id = f.character_id
+      ''');
+
+      final characters = maps.map(Character.fromDatabase).toList();
+
+      _log.info('Loaded ${characters.length} favorite characters from database');
+      return ListResponse(pages: 1, count: characters.length, response: characters);
+    } catch (e, stackTrace) {
+      _log.severe('Failed to load favorite characters from database', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> save(List<Character> characters) async {
     try {
       final database = await _db.database;
@@ -56,6 +76,60 @@ class CharactersServicesLocal implements CharactersServicesWritable {
       _log.info('Saved ${characters.length} characters to database');
     } catch (e, stackTrace) {
       _log.severe('Failed to save characters to database', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> delete(List<Character> items) async {
+    try {
+      final database = await _db.database;
+      final batch = database.batch();
+
+      for (final character in items) {
+        batch.delete('characters', where: 'id = ?', whereArgs: [character.id]);
+      }
+
+      await batch.commit(noResult: true);
+      _log.info('Deleted ${items.length} characters from database');
+    } catch (e, stackTrace) {
+      _log.severe('Failed to delete characters from database', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> clear() async {
+    try {
+      final database = await _db.database;
+      await database.delete('characters');
+      _log.info('Cleared all characters from database');
+    } catch (e, stackTrace) {
+      _log.severe('Failed to clear characters from database', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> addFavorite(Character character) async {
+    try {
+      final database = await _db.database;
+      await database.insert('favorites', {'character_id': character.id}, conflictAlgorithm: ConflictAlgorithm.ignore);
+      _log.info('Added character ${character.id} to favorites');
+    } catch (e, stackTrace) {
+      _log.severe('Failed to add character to favorites', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeFavorite(Character character) async {
+    try {
+      final database = await _db.database;
+      await database.delete('favorites', where: 'character_id = ?', whereArgs: [character.id]);
+      _log.info('Removed character ${character.id} from favorites');
+    } catch (e, stackTrace) {
+      _log.severe('Failed to remove character from favorites', e, stackTrace);
       rethrow;
     }
   }

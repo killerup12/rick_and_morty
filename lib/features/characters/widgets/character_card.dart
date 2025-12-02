@@ -1,9 +1,10 @@
 part of '../characters.dart';
 
 class CharacterCard extends StatelessWidget {
-  const CharacterCard(this.character, {this.onFavorite, this.onPressed, super.key});
+  const CharacterCard(this.character, {this.isFavorite = false, this.onFavorite, this.onPressed, super.key});
 
   final Character character;
+  final bool isFavorite;
   final VoidCallback? onFavorite;
   final VoidCallback? onPressed;
 
@@ -24,7 +25,7 @@ class CharacterCard extends StatelessWidget {
                 Semantics(
                   button: true,
                   label: 'Add ${character.name} to favorites',
-                  child: IconButton(icon: Icon(Icons.star_border), onPressed: onFavorite),
+                  child: IconButton(icon: Icon(isFavorite ? Icons.star : Icons.star_border), onPressed: onFavorite),
                 ),
               Row(
                 spacing: 16,
