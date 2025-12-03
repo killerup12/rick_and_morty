@@ -10,6 +10,11 @@ class RouteObjectsContainer {
   final String path;
   final List<Object> objects;
 
+  void add(Object object) {
+    objects.add(object);
+    if (object is RouteLifeCycle) object.init();
+  }
+
   void dispose() {
     for (final object in objects) {
       if (object is RouteLifeCycle) object.dispose();

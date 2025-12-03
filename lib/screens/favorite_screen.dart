@@ -13,32 +13,33 @@ class FavoriteScreen extends StatefulWidget {
 
 class _FavoriteScreenState extends State<FavoriteScreen> with DependencyPermission {
   late final charactersStore = getStore<CharactersStore>();
+  late final favoritesStore = getStore<FavoritesStore>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Observer(
         builder: (context) {
-          final chars = charactersStore.favorites;
+          final characters = favoritesStore.favorites;
 
-          if (chars == null) return const Center(child: CircularProgressIndicator());
+          if (characters == null) return const Center(child: CircularProgressIndicator());
           return CupertinoScrollbar(
             child: ListView.separated(
               padding: const EdgeInsets.all(16) + MediaQuery.paddingOf(context).copyWith(bottom: 0),
-              itemCount: chars.length + (charactersStore.canUploadMore ? 0 : 1),
+              itemCount: characters.length + (charactersStore.canUploadMore ? 0 : 1),
               separatorBuilder: (context, index) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
-                if (index >= chars.length && charactersStore.canUploadMore) {
+                if (index >= characters.length && charactersStore.canUploadMore) {
                   return const Center(
                     child: Padding(padding: .all(16), child: CircularProgressIndicator()),
                   );
                 }
 
-                final character = chars[index];
+                final character = characters[index];
                 return CharacterCard(
                   character,
-                  isFavorite: charactersStore.isFavorite(character),
-                  onFavorite: () => charactersStore.toggleFavorite(character),
+                  isFavorite: favoritesStore.isFavorite(character),
+                  onFavorite: () => favoritesStore.toggle(character),
                 );
               },
             ),

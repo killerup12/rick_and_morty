@@ -14,10 +14,27 @@ class FavoriteBrunchRoute extends StatefulShellBranchData {
     TypedStatefulShellBranch<FavoriteBrunchRoute>(routes: [TypedGoRoute<FavoriteRoute>(path: '/favorites')]),
   ],
 )
-class HomeRoute extends StatefulShellRouteData {
-  const HomeRoute();
+class HomeRoute extends StatefulShellRouteData with RouteAware, DependencyInjector {
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigationKey;
 
   @override
-  Widget builder(BuildContext context, GoRouterState state, StatefulNavigationShell navigationShell) =>
-      HomeScreen(navigationShell: navigationShell);
+  void injector(BuildContext context, GoRouterState state) {
+    final onlineServices = CharactersServicesNetwork();
+    final localServices = CharactersServicesLocal(DatabaseHelper.instance);
+    final repo = CharactersRepository(onlineServices: onlineServices, localServices: localServices);
+    injectForce(CharactersStore(repository: repo));
+    injectSoft(() => FavoritesStore(services: localServices));
+  }
+
+  @override
+  Widget builder(BuildContext context, GoRouterState state, StatefulNavigationShell navigationShell) {
+    return LifeCycleWidget(
+      onInit: () {
+        path = runtimeType.toString();
+        injector(context, state);
+      },
+      onDispose: () => dispose(context, state),
+      child: HomeScreen(navigationShell: navigationShell),
+    );
+  }
 }

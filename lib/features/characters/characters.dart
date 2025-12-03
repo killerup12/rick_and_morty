@@ -12,6 +12,8 @@ part 'characters.g.dart';
 part 'data/characters_services.dart';
 part 'data/characters_services_local.dart';
 part 'data/characters_services_network.dart';
+part 'domain/characters_repository.dart';
 part 'domain/characters_store.dart';
+part 'domain/favorites_store.dart';
 part 'model/characters_filters.dart';
 part 'widgets/character_card.dart';

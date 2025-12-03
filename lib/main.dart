@@ -10,6 +10,7 @@ final _goRouter = GoRouter(
   initialLocation: CharactersRoute().location,
   navigatorKey: rootNavigationKey,
   restorationScopeId: 'root',
+  debugLogDiagnostics: true,
 );
 
 void main() async {

@@ -42,11 +42,6 @@ class _LifeCycleWidgetState extends State<LifeCycleWidget> {
   }
 
   @override
-  void deactivate() {
-    super.deactivate();
-  }
-
-  @override
   void dispose() {
     widget.onDispose?.call();
     super.dispose();

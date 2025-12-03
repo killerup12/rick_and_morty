@@ -14,6 +14,7 @@ class CharactersScreen extends StatefulWidget {
 
 class _CharactersScreenState extends State<CharactersScreen> with DependencyPermission {
   late final charactersStore = getStore<CharactersStore>();
+  late final favoritesStore = getStore<FavoritesStore>();
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +43,16 @@ class _CharactersScreenState extends State<CharactersScreen> with DependencyPerm
                       );
                     }
                     final character = chars[index];
-                    return CharacterCard(
-                      character,
-                      isFavorite: charactersStore.isFavorite(character),
-                      onFavorite: () => charactersStore.toggleFavorite(character),
+                    return Observer(
+                      builder: (context) {
+                        final favoriteCharacters = favoritesStore.favorites;
+
+                        return CharacterCard(
+                          character,
+                          isFavorite: favoriteCharacters?.contains(character) ?? false,
+                          onFavorite: () => favoritesStore.toggle(character),
+                        );
+                      },
                     );
                   },
                 ),

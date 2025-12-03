@@ -9,6 +9,7 @@ part of 'routes.dart';
 List<RouteBase> get $appRoutes => [$homeRoute];
 
 RouteBase get $homeRoute => StatefulShellRouteData.$route(
+  parentNavigatorKey: HomeRoute.$parentNavigatorKey,
   factory: $HomeRouteExtension._fromState,
   branches: [
     StatefulShellBranchData.$branch(
@@ -28,7 +29,7 @@ RouteBase get $homeRoute => StatefulShellRouteData.$route(
 );
 
 extension $HomeRouteExtension on HomeRoute {
-  static HomeRoute _fromState(GoRouterState state) => const HomeRoute();
+  static HomeRoute _fromState(GoRouterState state) => HomeRoute();
 }
 
 mixin $CharactersRoute on GoRouteData {

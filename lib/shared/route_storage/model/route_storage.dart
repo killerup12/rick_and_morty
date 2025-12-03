@@ -56,7 +56,7 @@ class _RouteStorage {
       final routeStore = _routeStores[i];
       if (routeStore.path != path) continue;
 
-      routeStore.objects.add(object);
+      routeStore.add(object);
       return;
     }
 

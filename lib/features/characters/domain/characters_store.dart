@@ -3,54 +3,31 @@ part of '../characters.dart';
 class CharactersStore = _CharactersStoreBase with _$CharactersStore;
 
 abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMixin<CharactersFilters> {
-  _CharactersStoreBase({required CharactersServices onlineServices, required CharactersServicesWritable localServices})
-    : _onlineServices = onlineServices,
-      _localServices = localServices;
+  _CharactersStoreBase({required CharactersRepository repository}) : _repository = repository;
 
-  final CharactersServices _onlineServices;
-  final CharactersServicesWritable _localServices;
+  final CharactersRepository _repository;
 
   @override
   final filters = CharactersFilters();
 
   @readonly
   ObservableList<Character>? _characters;
-  @readonly
-  ObservableList<Character>? _favorites;
-
-  bool isFavorite(Character character) => _favorites?.contains(character) ?? false;
 
   @override
   void init() {
     super.init();
-    _localServices.getFavorites().then((result) {
-      _favorites = result.response.asObservable();
-    });
-    uploadRequest((filters) => _onlineServices.getCharacters(filters))
-        .then((result) {
-          _localServices.save(result);
-          return result;
-        })
-        .onError((_, __) {
-          return _localServices.getCharacters(filters).then((result) => result.response);
-        })
-        .then((result) {
-          return _characters = result.asObservable();
-        });
+    _loadCharacters();
   }
 
   @override
   void dispose() {
     _characters = null;
-    _favorites = null;
     super.dispose();
   }
 
   @action
-  @override
-  Future<void> upload() async {
-    final chars = await uploadRequest((filters) => _onlineServices.getCharacters(filters));
-    await _localServices.save(chars);
+  Future<void> _loadCharacters() async {
+    final chars = await uploadRequest((filters) => _repository.getCharacters(filters));
     if (_characters == null) {
       _characters = chars.asObservable();
     } else {
@@ -60,21 +37,13 @@ abstract class _CharactersStoreBase with Store, RouteInjectable, ListControlsMix
 
   @action
   @override
+  Future<void> upload() => _loadCharacters();
+
+  @action
+  @override
   Future<void> refresh() {
     _characters?.clear();
     toDefault();
     return upload();
-  }
-
-  @action
-  Future<void> toggleFavorite(Character character) async {
-    final isFavorite = _favorites?.contains(character) ?? false;
-    if (isFavorite) {
-      await _localServices.removeFavorite(character);
-      _favorites?.remove(character);
-    } else {
-      await _localServices.addFavorite(character);
-      _favorites?.add(character);
-    }
   }
 }
